@@ -2,8 +2,12 @@ import React, { useState } from 'react'
 import { User, Lock, Eye, EyeOff, AlertTriangle, CheckCircle2, Loader2, FlaskConical } from './Icons'
 import { login } from '../services/authService'
 
+// 请确保将背景图片保存为 src/assets/login_bg.jpg
+// 如果没有图片，将显示深色背景
+import loginBg from '../assets/login_bg.jpg'
+
 /**
- * 登录模态框组件
+ * 登录模态框组件 - 玻璃拟态风格
  */
 export default function LoginModal({ onLoginSuccess, onClose }) {
   const [formData, setFormData] = useState({
@@ -14,6 +18,7 @@ export default function LoginModal({ onLoginSuccess, onClose }) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [showDemo, setShowDemo] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
 
   // 演示账户信息
   const demoAccounts = [
@@ -44,7 +49,6 @@ export default function LoginModal({ onLoginSuccess, onClose }) {
       const result = await login(formData.username, formData.password)
       
       if (result.success) {
-        // 登录成功
         if (onLoginSuccess) {
           onLoginSuccess(result.user)
         }
@@ -91,375 +95,266 @@ export default function LoginModal({ onLoginSuccess, onClose }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        backdropFilter: 'blur(8px)',
+        backgroundImage: `url(${loginBg})`, // 使用导入的背景图
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: '#0f172a', // 备用背景色
         zIndex: 3000,
-        animation: 'fadeIn 0.3s ease-out',
       }}
       onWheel={(e) => e.stopPropagation()}
       onTouchMove={(e) => e.stopPropagation()}
     >
+      {/* 遮罩层，增加背景图的可读性 */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        zIndex: -1
+      }} />
+
       <div 
         style={{
-          backgroundColor: 'white',
-          borderRadius: '24px',
-          width: '480px',
+          width: '400px',
           maxWidth: '90vw',
-          maxHeight: '90vh',
-          overflow: 'hidden',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-          animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          padding: '40px',
+          borderRadius: '20px',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
           display: 'flex',
           flexDirection: 'column',
+          color: 'white',
+          animation: 'fadeInUp 0.5s ease-out',
         }}
         onWheel={(e) => e.stopPropagation()}
         onTouchMove={(e) => e.stopPropagation()}
-        onScroll={(e) => e.stopPropagation()}
       >
-        
-        {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-          padding: '40px 40px 32px',
-          color: 'white',
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden',
+        <h2 style={{ 
+          textAlign: 'center', 
+          fontSize: '32px', 
+          fontWeight: '600', 
+          margin: '0 0 40px 0',
+          textShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}>
-          {/* 装饰性背景 */}
+          Login
+        </h2>
+
+        {/* 错误提示 */}
+        {error && (
           <div style={{
-            position: 'absolute',
-            top: '-50%',
-            right: '-20%',
-            width: '200px',
-            height: '200px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
-          }} />
-          
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '20px',
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 20px',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-            }}>
-              <FlaskConical size={40} />
-            </div>
-            <h2 style={{ margin: '0 0 8px', fontSize: '28px', fontWeight: '700' }}>
-              实验室管理系统
-            </h2>
-            <p style={{ margin: 0, fontSize: '16px', opacity: 0.9 }}>
-              请登录您的账户
-            </p>
+            backgroundColor: 'rgba(254, 202, 202, 0.2)',
+            border: '1px solid rgba(254, 202, 202, 0.4)',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            color: '#fecaca',
+            fontSize: '14px',
+          }}>
+            <AlertTriangle size={16} />
+            {error}
           </div>
-        </div>
+        )}
 
-        {/* Content */}
-        <div style={{ padding: '40px', flex: 1 }}>
-          {/* 错误提示 */}
-          {error && (
-            <div style={{
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: '12px',
-              padding: '16px 20px',
-              marginBottom: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              color: '#991b1b',
-              fontSize: '14px',
-            }}>
-              <AlertTriangle size={20} />
-              {error}
-            </div>
-          )}
-
-          {/* 登录表单 */}
-          <form onSubmit={handleSubmit} style={{ marginBottom: '32px' }}>
-            {/* 用户名输入 */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
+        <form onSubmit={handleSubmit}>
+          {/* 用户名 */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ 
+              display: 'block', 
+              fontSize: '14px', 
+              marginBottom: '8px',
+              color: 'rgba(255, 255, 255, 0.9)'
+            }}>Email / Username</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '12px 40px 12px 0',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '2px solid rgba(255, 255, 255, 0.3)',
+                  color: 'white',
+                  fontSize: '16px',
+                  outline: 'none',
+                  transition: 'all 0.3s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={e => e.target.style.borderBottomColor = 'white'}
+                onBlur={e => e.target.style.borderBottomColor = 'rgba(255, 255, 255, 0.3)'}
+              />
+              <div style={{
+                position: 'absolute',
+                right: '0',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'rgba(255, 255, 255, 0.8)'
               }}>
-                用户名
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  placeholder="请输入用户名"
-                  disabled={isLoading}
-                  style={{
-                    width: '100%',
-                    padding: '14px 18px 14px 50px',
-                    borderRadius: '12px',
-                    border: '1px solid #e2e8f0',
-                    backgroundColor: isLoading ? '#f8fafc' : '#f8fafc',
-                    fontSize: '15px',
-                    outline: 'none',
-                    transition: 'all 0.2s',
-                    boxSizing: 'border-box',
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#4f46e5'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                />
-                <div style={{
-                  position: 'absolute',
-                  left: '16px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#64748b',
-                }}>
-                  <User size={18} />
-                </div>
+                <User size={20} />
               </div>
             </div>
+          </div>
 
-            {/* 密码输入 */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-              }}>
-                密码
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="请输入密码"
-                  disabled={isLoading}
-                  style={{
-                    width: '100%',
-                    padding: '14px 50px 14px 50px',
-                    borderRadius: '12px',
-                    border: '1px solid #e2e8f0',
-                    backgroundColor: isLoading ? '#f8fafc' : '#f8fafc',
-                    fontSize: '15px',
-                    outline: 'none',
-                    transition: 'all 0.2s',
-                    boxSizing: 'border-box',
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#4f46e5'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                />
-                <div style={{
-                  position: 'absolute',
-                  left: '16px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#64748b',
-                }}>
-                  <Lock size={18} />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                  style={{
-                    position: 'absolute',
-                    right: '16px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: '#64748b',
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    padding: '4px',
+          {/* 密码 */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ 
+              display: 'block', 
+              fontSize: '14px', 
+              marginBottom: '8px',
+              color: 'rgba(255, 255, 255, 0.9)'
+            }}>Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '12px 40px 12px 0',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '2px solid rgba(255, 255, 255, 0.3)',
+                  color: 'white',
+                  fontSize: '16px',
+                  outline: 'none',
+                  transition: 'all 0.3s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={e => e.target.style.borderBottomColor = 'white'}
+                onBlur={e => e.target.style.borderBottomColor = 'rgba(255, 255, 255, 0.3)'}
+              />
+              <div style={{
+                position: 'absolute',
+                right: '0',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'rgba(255, 255, 255, 0.8)',
+                cursor: 'pointer'
+              }}
+              onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Lock size={20} />}
+              </div>
+            </div>
+          </div>
+
+          {/* 选项 */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '40px',
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.9)'
+          }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                style={{ cursor: 'pointer' }}
+              />
+              Remember me
+            </label>
+            <a href="#" style={{ color: 'white', textDecoration: 'none' }} onClick={e => e.preventDefault()}>
+              Forgot password?
+            </a>
+          </div>
+
+          {/* 登录按钮 */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              width: '100%',
+              padding: '14px',
+              borderRadius: '30px',
+              border: 'none',
+              backgroundColor: 'white',
+              color: '#0f172a',
+              fontSize: '16px',
+              fontWeight: '700',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              transition: 'transform 0.2s',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+            }}
+            onMouseEnter={e => !isLoading && (e.currentTarget.style.transform = 'scale(1.02)')}
+            onMouseLeave={e => !isLoading && (e.currentTarget.style.transform = 'scale(1)')}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+        {/* 注册链接 */}
+        <div style={{ 
+          textAlign: 'center', 
+          marginTop: '30px', 
+          fontSize: '14px',
+          color: 'rgba(255, 255, 255, 0.8)'
+        }}>
+          Don't have an account? 
+          <a href="#" style={{ color: 'white', fontWeight: '600', marginLeft: '5px', textDecoration: 'none' }}>
+            Signup now
+          </a>
+        </div>
+
+        {/* 演示账户入口 (保留功能但隐藏式) */}
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <button
+            onClick={() => setShowDemo(!showDemo)}
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: 'rgba(255,255,255,0.7)',
+              padding: '5px 10px',
+              borderRadius: '15px',
+              fontSize: '12px',
+              cursor: 'pointer'
+            }}
+          >
+            {showDemo ? 'Close Demo' : 'Demo Accounts'}
+          </button>
+          
+          {showDemo && (
+            <div style={{ 
+              marginTop: '15px', 
+              backgroundColor: 'rgba(0,0,0,0.5)', 
+              padding: '10px', 
+              borderRadius: '10px' 
+            }}>
+              {demoAccounts.map((account, index) => (
+                <div 
+                  key={index} 
+                  onClick={() => quickLogin(account.username, account.password)}
+                  style={{ 
+                    padding: '8px', 
+                    cursor: 'pointer', 
+                    borderBottom: index === 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    fontSize: '13px'
                   }}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
+                  {account.name}: {account.username}
+                </div>
+              ))}
             </div>
-
-            {/* 登录按钮 */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '16px',
-                borderRadius: '12px',
-                border: 'none',
-                background: isLoading 
-                  ? 'linear-gradient(135deg, #94a3b8, #64748b)' 
-                  : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                color: 'white',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                boxShadow: isLoading 
-                  ? '0 4px 12px rgba(148, 163, 184, 0.3)' 
-                  : '0 4px 12px rgba(79, 70, 229, 0.3)',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={e => {
-                if (!isLoading) {
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }
-              }}
-              onMouseLeave={e => {
-                if (!isLoading) {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
-                  登录中...
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={20} />
-                  登录
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* 演示账户 */}
-          <div style={{
-            borderTop: '1px solid #e2e8f0',
-            paddingTop: '24px',
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '16px',
-            }}>
-              <h4 style={{
-                margin: 0,
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#64748b',
-              }}>
-                演示账户
-              </h4>
-              <button
-                type="button"
-                onClick={() => setShowDemo(!showDemo)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#4f46e5',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                }}
-              >
-                {showDemo ? '隐藏' : '显示'}
-              </button>
-            </div>
-
-            {showDemo && (
-              <div style={{
-                display: 'grid',
-                gap: '8px',
-              }}>
-                {demoAccounts.map((account, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => quickLogin(account.username, account.password)}
-                    disabled={isLoading}
-                    style={{
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      border: '1px solid #e2e8f0',
-                      backgroundColor: 'white',
-                      textAlign: 'left',
-                      cursor: isLoading ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.2s',
-                      opacity: isLoading ? 0.6 : 1,
-                    }}
-                    onMouseEnter={e => {
-                      if (!isLoading) {
-                        e.currentTarget.style.backgroundColor = '#f8fafc'
-                        e.currentTarget.style.borderColor = '#cbd5e1'
-                      }
-                    }}
-                    onMouseLeave={e => {
-                      if (!isLoading) {
-                        e.currentTarget.style.backgroundColor = 'white'
-                        e.currentTarget.style.borderColor = '#e2e8f0'
-                      }
-                    }}
-                  >
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                      <div>
-                        <div style={{
-                          fontSize: '13px',
-                          fontWeight: '600',
-                          color: '#0f172a',
-                          marginBottom: '2px',
-                        }}>
-                          {account.name}
-                        </div>
-                        <div style={{
-                          fontSize: '11px',
-                          color: '#64748b',
-                        }}>
-                          {account.username} / {account.password}
-                        </div>
-                      </div>
-                      <div style={{
-                        fontSize: '11px',
-                        color: '#4f46e5',
-                        fontWeight: '600',
-                      }}>
-                        {account.role}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
         </div>
+
       </div>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
