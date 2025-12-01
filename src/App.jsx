@@ -10,7 +10,9 @@ export default function App() {
 
   // 检查登录状态（刷新后需要重新登录，所以这里直接设置为未登录）
   useEffect(() => {
-    // 刷新页面后不恢复登录状态，直接显示登录界面
+    // 刷新页面后清除所有登录状态，直接显示登录界面
+    sessionStorage.removeItem('authToken')
+    localStorage.clear() // 清除所有本地存储
     setIsLoading(false)
   }, [])
 
