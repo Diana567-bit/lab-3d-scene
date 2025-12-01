@@ -134,9 +134,9 @@ export const login = async (username, password) => {
     currentUser = { ...user }
     delete currentUser.password // 移除密码信息
     
-    // 保存到localStorage
-    localStorage.setItem('authToken', token)
-    localStorage.setItem('currentUser', JSON.stringify(currentUser))
+    // 注意：不保存到localStorage，刷新页面需要重新登录
+    // 只保存token用于会话期间的验证
+    sessionStorage.setItem('authToken', token)
     
     // 记录登录日志
     logUserAction('用户登录', { username, loginTime: user.lastLogin })
@@ -167,9 +167,8 @@ export const logout = async () => {
       logUserAction('用户登出', { username: currentUser.username, logoutTime: new Date().toISOString() })
     }
     
-    // 清除本地存储
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('currentUser')
+    // 清除会话存储
+    sessionStorage.removeItem('authToken')
     
     // 清除当前用户
     currentUser = null
@@ -192,24 +191,8 @@ export const logout = async () => {
  * @returns {Object|null} 当前用户信息
  */
 export const getCurrentUser = () => {
-  if (currentUser) {
-    return currentUser
-  }
-  
-  // 尝试从localStorage恢复
-  try {
-    const storedUser = localStorage.getItem('currentUser')
-    const token = localStorage.getItem('authToken')
-    
-    if (storedUser && token) {
-      currentUser = JSON.parse(storedUser)
-      return currentUser
-    }
-  } catch (error) {
-    console.error('恢复用户信息失败:', error)
-  }
-  
-  return null
+  // 只返回内存中的用户状态，刷新页面后需要重新登录
+  return currentUser
 }
 
 /**

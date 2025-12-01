@@ -8,24 +8,30 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // 检查本地存储的登录状态
+  // 检查登录状态（刷新后需要重新登录，所以这里直接设置为未登录）
   useEffect(() => {
-    const checkAuthStatus = () => {
-      try {
-        const currentUser = getCurrentUser()
-        if (currentUser) {
-          setUser(currentUser)
-          setIsAuthenticated(true)
-        }
-      } catch (error) {
-        console.error('检查登录状态时出错:', error)
-      } finally {
-        setIsLoading(false)
+    // 刷新页面后不恢复登录状态，直接显示登录界面
+    setIsLoading(false)
+  }, [])
+
+  // 监听网络状态，网络中断时自动退出到登录界面
+  useEffect(() => {
+    const handleOffline = async () => {
+      console.log('网络中断，正在退出登录...')
+      if (isAuthenticated) {
+        await logout()
+        setUser(null)
+        setIsAuthenticated(false)
+        alert('网络连接已中断，请重新登录')
       }
     }
 
-    checkAuthStatus()
-  }, [])
+    window.addEventListener('offline', handleOffline)
+    
+    return () => {
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [isAuthenticated])
 
   const handleLogin = (userObj) => {
     setUser(userObj)
