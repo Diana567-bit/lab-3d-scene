@@ -4,7 +4,7 @@
  */
 
 // AI服务地址 - 腾讯云服务器
-c0nst AI_API_BASE = 'http://42.192.58.127:5000'
+const AI_API_BASE = 'http://42.192.58.127:5000';
 
 /**
  * 异常检测 - 预测未来30分钟的环境异常
@@ -125,5 +125,6 @@ export const checkCompatibility = async (reagent1, reagent2) => {
   const question = `${reagent1}和${reagent2}可以一起存放吗？`
   return await askQuestion(question)
 }
+
 
 
